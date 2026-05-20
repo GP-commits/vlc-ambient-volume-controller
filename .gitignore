@@ -1,0 +1,19 @@
+# Python temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# State files & local configuration
+vlc_volume_state.json
+vlc_volume_state.json.tmp
+config.json
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# OS specific files
+.DS_Store
+Thumbs.db

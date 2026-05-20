@@ -55,7 +55,7 @@ echo HOW TO USE:
 echo 1. Start the python background listener by double-clicking:
 echo    vlc_noise_listener.py
 echo 2. Open VLC Media Player.
-echo 3. Navigate to: View -> Ambient Volume Controller
+echo 3. Navigate to: View -^> Ambient Volume Controller
 echo 4. Play any media! The volume will adjust based on room noise.
 echo.
 echo NOTE: You can customize parameters (baseVolume, maxVolume,

@@ -27,21 +27,20 @@ if %errorlevel% neq 0 (
 )
 echo.
 
-:: Step 2: Deploy Lua plugin to VLC directory
-echo [3/3] Locating VLC local extension directory...
-set "VLC_EXT_DIR=%APPDATA%\vlc\lua\extensions"
+:: Step 2: Deploy Lua interface script to VLC directory
+echo [3/3] Deploying Lua interface script to VLC...
+set "VLC_INTF_DIR=%APPDATA%\vlc\lua\intf"
 
-if not exist "%VLC_EXT_DIR%" (
-    echo Directory "%VLC_EXT_DIR%" does not exist. Creating it...
-    mkdir "%VLC_EXT_DIR%"
+if not exist "%VLC_INTF_DIR%" (
+    echo Directory "%VLC_INTF_DIR%" does not exist. Creating it...
+    mkdir "%VLC_INTF_DIR%"
 )
 
-echo Copying ambient_volume.lua to "%VLC_EXT_DIR%"...
-copy /Y "%~dp0ambient_volume.lua" "%VLC_EXT_DIR%\"
+echo Copying ambient_volume.lua to "%VLC_INTF_DIR%"...
+copy /Y "%~dp0ambient_volume.lua" "%VLC_INTF_DIR%\"
 if %errorlevel% neq 0 (
-    echo [ERROR] Failed to copy the Lua script to VLC extensions directory.
-    echo Please run this script with Administrative permissions, or manually copy
-    echo ambient_volume.lua to %VLC_EXT_DIR%
+    echo [ERROR] Failed to copy the Lua script to VLC interface directory.
+    echo Please manually copy ambient_volume.lua to %VLC_INTF_DIR%
     pause
     exit /b 1
 )
@@ -52,11 +51,16 @@ echo  Setup Completed Successfully!
 echo ==========================================================
 echo.
 echo HOW TO USE:
-echo 1. Start the python background listener by double-clicking:
-echo    vlc_noise_listener.py
-echo 2. Open VLC Media Player.
-echo 3. Navigate to: View -^> Ambient Volume Controller
-echo 4. Play any media! The volume will adjust based on room noise.
+echo.
+echo 1. Start the Python background listener:
+echo    Double-click vlc_noise_listener.py (keep the window open)
+echo.
+echo 2. Launch VLC with the ambient volume interface enabled:
+echo    "C:\Program Files\VideoLAN\VLC\vlc.exe" --extraintf=luaintf --lua-intf=ambient_volume
+echo.
+echo    Or create a shortcut with that command to launch easily!
+echo.
+echo 3. Play any media. The volume will adjust based on room noise.
 echo.
 echo NOTE: You can customize parameters (baseVolume, maxVolume,
 echo sensitivity, noiseThreshold) in:

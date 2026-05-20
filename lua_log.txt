@@ -1,0 +1,8 @@
+2026-05-20 18:19:07 - Extension activated
+2026-05-20 18:19:07 - Dialog created and shown
+2026-05-20 18:19:38 - Extension deactivated
+2026-05-20 18:19:38 - Dialog destroyed
+2026-05-20 18:19:41 - Extension activated
+2026-05-20 18:19:41 - Dialog created and shown
+2026-05-20 18:23:35 - Extension deactivated
+2026-05-20 18:23:35 - Dialog destroyed

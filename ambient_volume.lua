@@ -18,6 +18,16 @@ local lbl_volume = nil
 
 -- Shared State File Path (Forward slashes work on Windows in Lua)
 local SHARED_STATE_PATH = "C:/Users/gamer/.gemini/antigravity/scratch/vlc-ambient-volume-controller/vlc_volume_state.json"
+local LOG_FILE_PATH = "C:/Users/gamer/.gemini/antigravity/scratch/vlc-ambient-volume-controller/lua_log.txt"
+
+-- Simple logging helper
+local function log_debug(message)
+    local f = io.open(LOG_FILE_PATH, "a")
+    if f then
+        f:write(os.date("%Y-%m-%d %H:%M:%S") .. " - " .. message .. "\n")
+        f:close()
+    end
+end
 
 -- Simple helper to parse values from raw JSON strings via regex
 local function get_json_value(json_str, key)
@@ -45,16 +55,19 @@ end
 
 -- Extension activation hook
 function activate()
+    log_debug("Extension activated")
     create_dialog()
 end
 
 -- Extension deactivation hook
 function deactivate()
+    log_debug("Extension deactivated")
     destroy_dialog()
 end
 
 -- Dialog close hook
 function close()
+    log_debug("Extension closed")
     vlc.deactivate()
 end
 
@@ -73,6 +86,7 @@ function create_dialog()
     dlg:add_label("Configure settings in <b>config.json</b> located in the installation folder.", 1, 8, 3, 1)
     
     dlg:show()
+    log_debug("Dialog created and shown")
 end
 
 function destroy_dialog()
@@ -83,24 +97,25 @@ function destroy_dialog()
     lbl_status = nil
     lbl_noise = nil
     lbl_volume = nil
+    log_debug("Dialog destroyed")
 end
 
--- Periodic execution loop (called by VLC Extension Manager every ~100-300ms)
-function loop()
+-- Inner loop implementation wrapped in pcall
+local function inner_loop()
     -- Attempt to open the shared state file
     local file = io.open(SHARED_STATE_PATH, "r")
     if not file then
         if lbl_status then
             lbl_status:set_text("<b>Status:</b> Python listener script is not running.")
         end
-        return 1
+        return
     end
     
     local content = file:read("*a")
     file:close()
     
     if not content or content == "" then
-        return 1
+        return
     end
     
     -- Extract values from JSON content
@@ -114,12 +129,19 @@ function loop()
         if lbl_status then
             lbl_status:set_text("<b>Status:</b> Controller Disabled in settings.")
         end
-        return 1
+        return
     end
     
     -- Set VLC internal playback volume
     if vlc_volume then
-        vlc.volume.set(vlc_volume)
+        -- Safe volume setting check
+        if vlc.volume then
+            vlc.volume.set(vlc_volume)
+        else
+            log_debug("vlc.volume is nil! Trying fallback vlc.audio.volume...")
+            -- Fallback if vlc.volume is not exposed directly in this version
+            vlc.audio.volume(vlc_volume)
+        end
         
         -- Update Dialog Text elements
         if lbl_status then
@@ -132,6 +154,13 @@ function loop()
             lbl_volume:set_text("VLC Volume: <b>" .. tostring(target_pct) .. "%</b> (Value: " .. tostring(vlc_volume) .. "/256)")
         end
     end
-    
+end
+
+-- Periodic execution loop (called by VLC Extension Manager every ~100-300ms)
+function loop()
+    local status, err = pcall(inner_loop)
+    if not status then
+        log_debug("ERROR in loop: " .. tostring(err))
+    end
     return 1
 end
